@@ -3,7 +3,11 @@ services:
   backend:
     build: .
     ports:
-      - "8000:8000"
+      - "18000:8000"
+    environment:
+      - CH_HOST=ch
+    depends_on:
+      - ch
   ch:
     image: "clickhouse/clickhouse-server"
     ports:
