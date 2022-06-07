@@ -6,7 +6,7 @@
 
 ## Description
 1. the documentation of the api can read in `/docs` path
-2. this is for body request create table with custom columns ```{
+2. this is for body request create table with custom columns `{
 	"tb_name":"asepso",
 	"db_name":"asek",
 	"columns":{
@@ -16,5 +16,5 @@
 	},
 	"order_by":"name"
 }
-```
+`
 
