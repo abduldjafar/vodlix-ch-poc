@@ -35,3 +35,10 @@ class Ddl(object):
 
     def insert_into_ddl_history(self):
         return "INSERT INTO ddl.history (db_name,tb_name) VALUES "
+    
+    def delete_table(self,db_name, table_name):
+        return "DROP TABLE IF EXIST {}.{}".format(db_name, table_name)
+
+    def select_datas(self,columns,db_name, table_name,limit,offset):
+        columns = ",".join(columns)
+        return "SELECT {} FROM {}.{} LIMIT {},{}".format(columns,db_name,table_name,offset,limit)

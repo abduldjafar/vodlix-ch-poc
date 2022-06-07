@@ -23,3 +23,10 @@ class DDLServices(object):
             insert_query_ddl, [{'db_name': db_name, 'tb_name': tb_name}]
         )
 
+    def selec_data_from_table(self,db_name,tb_name,columns,limit,offset):
+        
+        query = self.query.select_datas(columns,db_name,tb_name,limit,offset)
+        self.config.execute_query(query)
+        datas = self.config.cursor.fetchall()
+
+        return datas
