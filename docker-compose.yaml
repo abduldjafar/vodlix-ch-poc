@@ -1,15 +1,16 @@
 version: "3.9"
 services:
+
+  ch:
+    image: "clickhouse/clickhouse-server"
+    ports:
+      - "8123:8123"
+      - "9000:9000"
   backend:
     build: .
     ports:
       - "18000:8000"
     environment:
       - CH_HOST=ch
-    depends_on:
+    links:
       - ch
-  ch:
-    image: "clickhouse/clickhouse-server"
-    ports:
-      - "8123:8123"
-      - "9000:9000"

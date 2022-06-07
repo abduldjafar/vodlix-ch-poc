@@ -1,11 +1,12 @@
 from math import fabs
 from typing import Union
 from services.ddlServices import ddlServices
-from fastapi import FastAPI,Path
+from fastapi import FastAPI,Path,Request,Body
 from models.models import Database, Table, Column
 
 app = FastAPI()
 ddlSvc = ddlServices.DDLServices()
+
 
 
 def setup_responses(msg, is_error, response_code, request_type,data):
@@ -65,3 +66,12 @@ async def get_datas(column: Column,
     msg = "success get data from {}.{}".format(database,table)
 
     return post_success_responses(msg,data_responses)
+
+@app.post("/api/v1/databasesTemo")
+async def get_datas_from_json(payload: dict = Body(...)):
+    ddlSvc.create_table_with_columns(payload)
+    return payload
+
+@app.get("/api/v1/table_ddl_history")
+async def create_table_ddl_history():
+    ddlSvc.create_ddl_history_table()

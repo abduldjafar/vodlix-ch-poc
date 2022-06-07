@@ -18,6 +18,15 @@ class Ddl(object):
         """.format(
             db_name, table_name
         )
+    
+    def create_table_with_columns(self, table_name, db_name,columns,order_by):
+        return """
+        CREATE TABLE {}.{} (
+            {}
+        ) ENGINE = MergeTree order by {} ;
+        """.format(
+            db_name, table_name,columns,order_by
+        )
 
     def create_ddl_database(self):
         return """

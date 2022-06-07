@@ -21,5 +21,5 @@ class Config(object):
 
         self.conn = connect("clickhouse://" + self.ch_host)
         self.cursor = self.conn.cursor()
-        self.cursor.execute(self.query.create_ddl_database())
-        self.cursor.execute(self.query.create_ddl_history_table())
+        #self.cursor.execute(self.query.create_ddl_database())
+        #self.cursor.execute(self.query.create_ddl_history_table())

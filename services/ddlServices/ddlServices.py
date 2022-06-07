@@ -22,6 +22,22 @@ class DDLServices(object):
         self.config.insert_data(
             insert_query_ddl, [{'db_name': db_name, 'tb_name': tb_name}]
         )
+    
+    def create_table_with_columns(self, payload):
+        db_name = payload["db_name"] 
+        tb_name = payload["tb_name"]
+        columns = payload["columns"]
+        order_by = payload["order_by"]
+
+        list_columns = []
+
+        for column in columns.keys():
+            list_columns.append("{} {}".format(column, columns[column]))
+        
+        fixed_columns = ",".join(list_columns)
+
+        query = self.query.create_table_with_columns(tb_name,db_name,fixed_columns,order_by)
+        self.config.execute_query(query)
 
     def selec_data_from_table(self,db_name,tb_name,columns,limit,offset):
         
@@ -30,3 +46,7 @@ class DDLServices(object):
         datas = self.config.cursor.fetchall()
 
         return datas
+
+    def create_ddl_history_table(self):
+        self.config.execute_query(self.query.create_ddl_database())
+        self.config.execute_query(self.query.create_ddl_history_table())
