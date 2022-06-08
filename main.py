@@ -83,7 +83,7 @@ async def get_datas_from_table_that_already_defined(
     table: str = Path(title="table that want to get datas"),
 ):
     data_responses = []
-    datas = ddlSvc.selec_data_from_table(database, table, column.columns, "5", "0")
+    datas = ddlSvc.selec_data_from_table(database, table, column.columns)
 
     columns = column.columns
 

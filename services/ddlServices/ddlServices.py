@@ -57,8 +57,11 @@ class DDLServices(object):
         self.config.insert_data(query,[datas])
         
 
-    def selec_data_from_table(self,db_name,tb_name,columns,limit,offset):
+    def selec_data_from_table(self,db_name,tb_name,columns,limit="",offset=""):
         
+        if limit == "" or offset =="":
+            limit="10000"
+            offset="0"
         query = self.query.select_datas(columns,db_name,tb_name,limit,offset)
         self.config.execute_query(query)
         datas = self.config.cursor.fetchall()
