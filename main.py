@@ -82,16 +82,7 @@ async def get_datas_from_table_that_already_defined(
     database: str = Path(title="database that want to get datas"),
     table: str = Path(title="table that want to get datas"),
 ):
-    data_responses = []
-    datas = ddlSvc.selec_data_from_table(database, table, column.columns)
-
-    columns = column.columns
-
-    for data in datas:
-        datas_dict = {}
-        for index in range(len(columns)):
-            datas_dict[columns[index]] = data[index]
-        data_responses.append(datas_dict)
+    data_responses = ddlSvc.selec_data_from_table(database, table, column)
 
     msg = "success get data from {}.{}".format(database, table)
 

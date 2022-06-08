@@ -57,16 +57,26 @@ class DDLServices(object):
         self.config.insert_data(query,[datas])
         
 
-    def selec_data_from_table(self,db_name,tb_name,columns,limit="",offset=""):
+    def selec_data_from_table(self,db_name,tb_name,column,limit="",offset=""):
         
+        columns = column.columns
         if limit == "" or offset =="":
             limit="10000"
             offset="0"
+
         query = self.query.select_datas(columns,db_name,tb_name,limit,offset)
         self.config.execute_query(query)
         datas = self.config.cursor.fetchall()
 
-        return datas
+        data_responses = []
+
+        for data in datas:
+            datas_dict = {}
+            for index in range(len(columns)):
+                datas_dict[columns[index]] = data[index]
+            data_responses.append(datas_dict)
+
+        return data_responses
 
     def create_ddl_history_table(self):
         self.config.execute_query(self.query.create_ddl_database())
