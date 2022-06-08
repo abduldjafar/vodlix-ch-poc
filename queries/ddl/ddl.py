@@ -46,8 +46,20 @@ class Ddl(object):
         return "INSERT INTO ddl.history (db_name,tb_name) VALUES "
     
     def delete_table(self,db_name, table_name):
-        return "DROP TABLE IF EXIST {}.{}".format(db_name, table_name)
+        return "DROP TABLE  {}.{}".format(db_name, table_name)
 
     def select_datas(self,columns,db_name, table_name,limit,offset):
         columns = ",".join(columns)
         return "SELECT {} FROM {}.{} LIMIT {},{}".format(columns,db_name,table_name,offset,limit)
+    
+    def insert_data_to_table(self,db_name,tb_name,columns):
+        return "INSERT INTO {}.{} {} VALUES ".format(db_name,tb_name,columns)
+    
+    def add_new_column(self,tb_name,column_name,data_type):
+        return "ALTER TABLE {} ADD COLUMN {} {} FIRST".format(tb_name,column_name,data_type)
+    
+    def delete_column(self,tb_name,column_name):
+        return "ALTER TABLE {} DROP COLUMN {}".format(tb_name,column_name)
+    
+    def use_db(self,db_name):
+        return "use {};".format(db_name)

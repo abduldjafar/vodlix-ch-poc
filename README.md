@@ -17,4 +17,22 @@
 	"order_by":"name"
 }
 `
+3. this is for body example request insert datas`
+	{
+		"tb_name":"uji",
+		"db_name":"testing",
+		"datas":{
+			"name":"Abdul",
+			"address":"H Taha",
+			"age":32
+		}
+	}
+`. field `datas` is dynamic.
+4. this is for body example alter table `{
+	"tb_name":"uji",
+	"db_name":"testing",
+	"column_name":"asoi",
+	"operation_type":"DELETE",
+	"data_type":"String"
+}`. cuurrently the operation type just ADD and DELETE. if choose DELETE operation, the `data_type` field can be empty.
 
