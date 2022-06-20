@@ -12,9 +12,48 @@ class Ddl(object):
     def create_table(self, table_name, db_name):
         return """
         CREATE TABLE {}.{} (
-            x String,
-            y String
-        ) ENGINE = MergeTree order by x ;
+            object_id Int32,
+            object_type Int32,
+            object_url String,
+            content_length String,
+            title String,
+            collection_id Int32,
+            content_list_id Int32,
+            partner_id Int32,
+            event_type String,
+            event_value Int32,
+            bitrate Int32,
+            width Int32,
+            height Int32,
+            app String,
+            app_version Int32,
+            app_id String,
+            utm_source String,
+            utm_term String,
+            utm_id Int32,
+            utm_medium String,
+            referrer String,
+            referrer_path String,
+            userid Int32,
+            session_id Int32,
+            ip String,
+            user_agent String,
+            browser String,
+            browser_version Int32,
+            os String,
+            os_version String,
+            device String,
+            device_name String,
+            country String,
+            region String,
+            city String,
+            latitude String,
+            longitude String,
+            isp String,
+            internet_speed Int32
+
+
+        ) ENGINE = MergeTree order by userid  partition by userid;
         """.format(
             db_name, table_name
         )
