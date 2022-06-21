@@ -53,7 +53,16 @@ async def get_datas_from_table_that_already_defined(
 
 
 @app.post("/api/v1/table_custom")
-async def create_table_with_spesific_columns(payload: dict = Body(...)):
+async def create_table_with_spesific_columns(payload: dict = Body(...,example={
+    "tb_name":"asepso",
+	"db_name":"asek",
+	"columns":{
+		"name":"String",
+		"address":"String",
+		"date":"Int32"
+	},
+	"order_by":"name"
+})):
     ddlSvc.create_table_with_columns(payload)
     return customHttpresp.post_success_responses("success create table")
 
@@ -65,12 +74,26 @@ async def create_table_ddl_history():
 
 
 @app.post("/api/v1/datas")
-async def insert_data(payload: dict = Body(...)):
+async def insert_data(payload: dict = Body(...,example={
+		"tb_name":"uji",
+		"db_name":"testing",
+		"datas":{
+			"name":"Abdul",
+			"address":"H Taha",
+			"age":32
+		}
+	})):
     ddlSvc.insert_data(payload)
     return customHttpresp.post_success_responses("success insert datas")
 
 
 @app.put("/api/v1/tables")
-async def alter_table(payload: dict = Body(...)):
+async def alter_table(payload: dict = Body(...,example={
+	"tb_name":"uji",
+	"db_name":"testing",
+	"column_name":"asoi",
+	"operation_type":"DELETE",
+	"data_type":"String"
+})):
     ddlSvc.alter_table(payload)
     return customHttpresp.put_success_responses("success do alter operation")
