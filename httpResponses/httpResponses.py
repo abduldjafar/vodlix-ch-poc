@@ -20,6 +20,13 @@ class CustomHttpResponses(object):
         request_type = "POST"
 
         return self.setup_responses(msg, is_error, response_code, request_type, data)
+    
+    def post_failed_responses(self,msg, data=None):
+        is_error = True
+        response_code = 500
+        request_type = "POST"
+
+        return self.setup_responses(msg, is_error, response_code, request_type, data)
 
 
     def delete_success_responses(self,msg, data=None):

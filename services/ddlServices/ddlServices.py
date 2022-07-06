@@ -15,56 +15,158 @@ class DDLServices(object):
         query = self.query.create_database(db_name)
         self.db.execute_query(query)
 
-    def create_table(self, db_name, tb_name):
+    def create_default_table(self, db_name, tb_name):
 
-        query = self.query.create_table(tb_name, db_name)
+        create_default_table_query = self.query.create_default_table(tb_name, db_name)
+        create_session_table_query = self.query.create_table_session(
+            "tb_sessions", db_name
+        )
         insert_query_ddl = self.query.insert_into_ddl_history()
 
-        self.db.execute_query(query)
+        self.db.execute_query(create_session_table_query)
+        self.db.execute_query(create_default_table_query)
         self.db.insert_data(
-            insert_query_ddl, [{'db_name': db_name, 'tb_name': tb_name}]
+            insert_query_ddl,
+            [{"db_name": db_name, "tb_name": tb_name, "is_default": True}],
         )
-    
+
     def create_table_with_columns(self, payload):
-        db_name = payload["db_name"] 
+        db_name = payload["db_name"]
         tb_name = payload["tb_name"]
         columns = payload["columns"]
         order_by = payload["order_by"]
+        insert_query_ddl = self.query.insert_into_ddl_history()
+        self.db.insert_data(
+            insert_query_ddl,
+            [{"db_name": db_name, "tb_name": tb_name, "is_default": False}],
+        )
 
         list_columns = []
 
         for column in columns.keys():
             list_columns.append("{} {}".format(column, columns[column]))
-        
+
         fixed_columns = ",".join(list_columns)
 
-        query = self.query.create_table_with_columns(tb_name,db_name,fixed_columns,order_by)
+        query = self.query.create_table_with_columns(
+            tb_name, db_name, fixed_columns, order_by
+        )
         self.db.execute_query(query)
-    
-    def insert_data(self,payload):
-        db_name = payload["db_name"] 
+
+    def insert_data(self, payload):
+        tb_sessions_column = {
+            "userid": None,
+            "session_id": 0,
+            "ip": None,
+            "user_agent": None,
+            "browser": None,
+            "browser_version": None,
+            "os": None,
+            "os_version": None,
+            "device": None,
+            "device_name": None,
+            "country": None,
+            "region": None,
+            "city": None,
+            "latitude": None,
+            "longitude": None,
+            "isp": None,
+            "internet_speed": None,
+            "app": None,
+            "app_version": None,
+            "app_id": None,
+        }
+
+        tb_default_columns = {
+            "object_id": None,
+            "object_type": None,
+            "object_url": None,
+            "content_length": None,
+            "title": None,
+            "collection_id": None,
+            "content_list_id": None,
+            "partner_id": None,
+            "event_type": None,
+            "event_value": None,
+            "bitrate": None,
+            "width": None,
+            "height": None,
+            "utm_source": None,
+            "utm_term": None,
+            "utm_id": None,
+            "utm_medium": None,
+            "referrer": None,
+            "referrer_path": None,
+            "session_id": 0,
+        }
+
+        db_name = payload["db_name"]
         tb_name = payload["tb_name"]
         datas = payload["datas"]
 
-        list_columns = []
+        if "session_id" not in datas or datas["session_id"] == 0 or datas["session_id"] is None:
+            if "session_id" not in datas:
+                return False,"session_id not exists"
+            else: 
+                return False,"session_id not valied : {} value".format(datas["session_id"])
 
-        for column in datas.keys():
-            list_columns.append(column)
-        
-        fixed_columns = "("+",".join(list_columns)+")"
-        
-        query = self.query.insert_data_to_table(db_name,tb_name,fixed_columns)
-        self.db.insert_data(query,[datas])
-        
+        def insert_datas(column_dict, tb_name):
+            list_datas_columns = list(
+                filter(
+                    lambda x: x in column_dict.keys(),
+                    [column for column in datas.keys()],
+                )
+            )
+            fixed_columns = "(" + ",".join(list_datas_columns) + ")"
+            query_insert = self.query.insert_data_to_table(
+                db_name, tb_name, fixed_columns
+            )
 
-    def selec_data_from_table(self,db_name,tb_name,column,limit="",offset=""):
-        
+            self.db.insert_data(
+                query_insert, [{x: datas[x] for x in list_datas_columns}]
+            )
+
+        select_query = self.query.select_datas_where(
+            ["is_default"],
+            "ddl",
+            "history",
+            "1",
+            "0",
+            ["db_name='{}'".format(db_name), "tb_name='{}'".format(tb_name)],
+        )
+        self.db.execute_query(select_query)
+        is_defult_table = self.db.cursor.fetchall()[0][0]
+
+        if is_defult_table:
+            query_for_check_sessionid = self.query.select_datas_where(
+                ["session_id"],
+                db_name,
+                "tb_sessions",
+                "1",
+                "0",
+                ["session_id='{}'".format(datas["session_id"])],
+            )
+
+            self.db.execute_query(query_for_check_sessionid)
+            session_id = self.db.cursor.fetchall()
+            session_id_exist = True if len(session_id) > 0 else False
+
+            if session_id_exist:
+                insert_datas(tb_default_columns, tb_name)
+
+            else:
+                insert_datas(tb_sessions_column, "tb_sessions")
+        return True,"sucess inserted datas"
+
+
+    def selec_data_from_table(self, db_name, tb_name, column, limit="", offset=""):
+
         columns = column.columns
-        if limit == "" or offset =="":
-            limit="10000"
-            offset="0"
+        if limit == "" or offset == "":
+            limit = "10000"
+            offset = "0"
 
-        query = self.query.select_datas(columns,db_name,tb_name,limit,offset)
+        query = self.query.select_datas(columns, db_name, tb_name, limit, offset)
         self.db.execute_query(query)
         datas = self.db.cursor.fetchall()
 
@@ -81,12 +183,12 @@ class DDLServices(object):
     def create_ddl_history_table(self):
         self.db.execute_query(self.query.create_ddl_database())
         self.db.execute_query(self.query.create_ddl_history_table())
-    
-    def delete_table(self,db_name,tb_name):
-        query = self.query.delete_table(db_name,tb_name)
+
+    def delete_table(self, db_name, tb_name):
+        query = self.query.delete_table(db_name, tb_name)
         self.db.execute_query(query)
-    
-    def alter_table(self,payload):
+
+    def alter_table(self, payload):
         tb_name = payload["tb_name"]
         db_name = payload["db_name"]
         column_name = payload["column_name"]
@@ -97,9 +199,9 @@ class DDLServices(object):
         if operation_type == "ADD":
 
             data_type = payload["data_type"]
-            query = self.query.add_new_column(tb_name,column_name,data_type)
+            query = self.query.add_new_column(tb_name, column_name, data_type)
 
         elif operation_type == "DELETE":
-            query = self.query.delete_column(tb_name,column_name)
+            query = self.query.delete_column(tb_name, column_name)
 
         self.db.execute_query(query)

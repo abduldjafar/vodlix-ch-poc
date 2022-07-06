@@ -23,7 +23,7 @@ async def create_database(database: Database):
 
 @app.post("/api/v1/tables")
 async def create_table_with_default_schema(table: Table):
-    ddlSvc.create_table(table.database_name, table.table_name)
+    ddlSvc.create_default_table(table.database_name, table.table_name)
 
     msg = "success create table {}.{}".format(table.database_name, table.table_name)
 
@@ -83,8 +83,12 @@ async def insert_data(payload: dict = Body(...,example={
 			"age":32
 		}
 	})):
-    ddlSvc.insert_data(payload)
-    return customHttpresp.post_success_responses("success insert datas")
+    data_inserted,message= ddlSvc.insert_data(payload)
+
+    if data_inserted != True:
+        return customHttpresp.post_failed_responses(message)
+    else:
+        return customHttpresp.post_success_responses(message)
 
 
 @app.put("/api/v1/tables")
