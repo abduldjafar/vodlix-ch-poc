@@ -21,10 +21,15 @@ class DDLServices(object):
         create_session_table_query = self.query.create_table_session(
             "tb_sessions", db_name
         )
+
+        create_view_default_table_joined_sessions_table = (
+            self.query.create_view_default_table_joined_sessions_table(db_name, tb_name)
+        )
         insert_query_ddl = self.query.insert_into_ddl_history()
 
         self.db.execute_query(create_session_table_query)
         self.db.execute_query(create_default_table_query)
+        self.db.execute_query(create_view_default_table_joined_sessions_table)
         self.db.insert_data(
             insert_query_ddl,
             [{"db_name": db_name, "tb_name": tb_name, "is_default": True}],
@@ -104,11 +109,17 @@ class DDLServices(object):
         tb_name = payload["tb_name"]
         datas = payload["datas"]
 
-        if "session_id" not in datas or datas["session_id"] == 0 or datas["session_id"] is None:
+        if (
+            "session_id" not in datas
+            or datas["session_id"] == 0
+            or datas["session_id"] is None
+        ):
             if "session_id" not in datas:
-                return False,"session_id not exists"
-            else: 
-                return False,"session_id not valied : {} value".format(datas["session_id"])
+                return False, "session_id not exists"
+            else:
+                return False, "session_id not valied : {} value".format(
+                    datas["session_id"]
+                )
 
         def insert_datas(column_dict, tb_name):
             list_datas_columns = list(
@@ -156,8 +167,7 @@ class DDLServices(object):
 
             else:
                 insert_datas(tb_sessions_column, "tb_sessions")
-        return True,"sucess inserted datas"
-
+        return True, "sucess inserted datas"
 
     def selec_data_from_table(self, db_name, tb_name, column, limit="", offset=""):
 
@@ -167,6 +177,41 @@ class DDLServices(object):
             offset = "0"
 
         query = self.query.select_datas(columns, db_name, tb_name, limit, offset)
+        self.db.execute_query(query)
+        datas = self.db.cursor.fetchall()
+
+        data_responses = []
+
+        for data in datas:
+            datas_dict = {}
+            for index in range(len(columns)):
+                datas_dict[columns[index]] = data[index]
+            data_responses.append(datas_dict)
+
+        return data_responses
+
+    def selec_data_using_payload(self, db_name, tb_name, payload):
+
+        columns = payload["columns"]
+        wheres = payload["where"]
+        limit = payload["limit"]
+        page = payload["page"]
+
+        filtered_conditions = (
+            [
+                "{}{}{}".format(where["column"], where["condition"], where["value"])
+                for where in wheres
+            ]
+            if len(wheres) > 0
+            else wheres
+        )
+
+        page = page - 1
+
+        query = self.query.select_datas_where(
+            columns, db_name, tb_name, str(limit), str(page), filtered_conditions
+        )
+        print(query)
         self.db.execute_query(query)
         datas = self.db.cursor.fetchall()
 

@@ -25,8 +25,8 @@ class Ddl(object):
             country Nullable(String),
             region Nullable(String),
             city Nullable(String),
-            latitude Nullable(String),
-            longitude Nullable(String),
+            latitude Nullable(Float32),
+            longitude Nullable(Float32),
             isp Nullable(String),
             internet_speed Nullable(Int32),
             app Nullable(String),
@@ -39,6 +39,16 @@ class Ddl(object):
             db_name, tb_name
         )
 
+    def create_view_default_table_joined_sessions_table(self,db_name, tb_name):
+        return """
+        create view {}.view_{} as SELECT * EXCEPT `b.session_id`
+        FROM
+        (
+            SELECT *
+            FROM {}.{} as a
+            INNER JOIN {}.tb_sessions  as b ON a.session_id = b.session_id
+        )
+        """.format(db_name,tb_name,db_name,tb_name,db_name)
     def create_default_table(self, table_name, db_name):
         return """
         CREATE TABLE IF NOT EXISTS {}.{} (
@@ -104,9 +114,9 @@ class Ddl(object):
         return "SELECT {} FROM {}.{} LIMIT {},{}".format(columns,db_name,table_name,offset,limit)
     
     def select_datas_where(self,columns,db_name, table_name,limit,offset,wheres):
-        wheres = " and ".join(wheres)
+        wheres = "where "+ " and ".join(wheres) if len(wheres) > 0 else ""
         columns = ",".join(columns)
-        return "SELECT {} FROM {}.{} where {} LIMIT {},{}".format(columns,db_name,table_name,wheres,offset,limit)
+        return "SELECT {} FROM {}.{} {} LIMIT {},{}".format(columns,db_name,table_name,wheres,offset,limit)
     
     def insert_data_to_table(self,db_name,tb_name,columns):
         return "INSERT INTO {}.{} {} VALUES ".format(db_name,tb_name,columns)

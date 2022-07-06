@@ -27,7 +27,9 @@ async def create_table_with_default_schema(table: Table):
 
     msg = "success create table {}.{}".format(table.database_name, table.table_name)
 
-    return customHttpresp.post_success_responses(msg)
+    return customHttpresp.post_success_responses(msg, {
+        "view_datas":"{}.view_{}".format(table.database_name, table.table_name)
+    })
 
 
 @app.delete("/api/v1/tables")
@@ -41,11 +43,46 @@ async def delete_table(table: Table):
 
 @app.post("/api/v1/{database}/{table}")
 async def get_datas_from_table_that_already_defined(
-    column: Column,
+    payload: dict = Body(...,example={
+    "columns":[
+        "session_id"
+    ],
+    "where":[
+        {
+            "column":"title",
+            "condition":"=",
+            "value":"'Teken 3'"
+        },
+        
+        {
+                "column":"longitude",
+                "condition":"<",
+                "value":"15"
+        },
+        {
+                "column":"longitude",
+                "condition":">",
+                "value":"15"
+        },
+        {
+                "column":"longitude",
+                "condition":"<=",
+                "value":"15"
+        },
+        {
+                "column":"longitude",
+                "condition":">=",
+                "value":"15"
+        }
+        
+    ],
+    "page":1,
+    "limit":100
+}),
     database: str = Path(title="database that want to get datas"),
     table: str = Path(title="table that want to get datas"),
 ):
-    data_responses = ddlSvc.selec_data_from_table(database, table, column)
+    data_responses = ddlSvc.selec_data_using_payload(database, table, payload)
 
     msg = "success get data from {}.{}".format(database, table)
 
