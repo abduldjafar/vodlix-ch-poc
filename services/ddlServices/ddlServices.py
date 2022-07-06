@@ -167,6 +167,7 @@ class DDLServices(object):
 
             else:
                 insert_datas(tb_sessions_column, "tb_sessions")
+                insert_datas(tb_default_columns, tb_name)
         return True, "sucess inserted datas"
 
     def selec_data_from_table(self, db_name, tb_name, column, limit="", offset=""):
