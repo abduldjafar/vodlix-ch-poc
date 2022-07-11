@@ -9,6 +9,21 @@ class Ddl(object):
             db_name
         )
 
+    def create_table_sources(self,tb_name,db_name):
+         return """
+        CREATE TABLE IF NOT EXISTS {}.{} (
+            source_id Int32,
+            utm_source Nullable(String),
+            utm_term Nullable(String),
+            utm_id Nullable(Int32),
+            utm_medium Nullable(String),
+            referrer Nullable(String),
+            referrer_path Nullable(String)
+        ) ENGINE = MergeTree order by source_id;
+        """.format(
+            db_name, tb_name
+        )
+
     def create_table_session(self, tb_name,db_name):
         return """
         CREATE TABLE IF NOT EXISTS {}.{} (
@@ -34,21 +49,63 @@ class Ddl(object):
             app_id Nullable(String)
 
 
-        ) ENGINE = MergeTree order by session_id  partition by session_id;
+        ) ENGINE = MergeTree order by session_id;
         """.format(
             db_name, tb_name
         )
 
     def create_view_default_table_joined_sessions_table(self,db_name, tb_name):
         return """
-        create view {}.view_{} as SELECT * EXCEPT `b.session_id`
+        create view {}.view_{} as 
+        SELECT 
+            a.object_id as object_id,
+            a.object_type as object_type,
+            a.object_url as object_url,
+            a.content_length as content_length,
+            a.title as title,
+            a.collection_id as collection_id,
+            a.content_list_id as content_list_id,
+            a.partner_id as partner_id,
+            a.event_type as event_type,
+            a.event_value as event_value,
+            a.bitrate as bitrate,
+            a.width as width,
+            a.height as height,
+            a.source_id as source_id,
+            a.session_id as session_id,
+            b.userid as userid,
+            b.ip as ip,
+            b.user_agent as user_agent,
+            b.browser as browser,
+            b.browser_version as browser_version,
+            b.os as os,
+            b.os_version as os_version,
+            b.device as device,
+            b.device_name as device_name,
+            b.country as country,
+            b.region as region,
+            b.city as city,
+            b.latitude  as latitude ,
+            b.longitude  as longitude ,
+            b.isp  as  isp,
+            b.internet_speed  as internet_speed,
+            b.app  as app ,
+            b.app_version  as app_version ,
+            b.app_id  as app_id ,
+            c.utm_source  as utm_source ,
+            c.utm_term  as utm_term ,
+            c.utm_id  as utm_id,
+            c.utm_medium  as utm_medium ,
+            c.referrer  as referrer,
+            c.referrer_path as referrer_path
         FROM
         (
             SELECT *
             FROM {}.{} as a
             INNER JOIN {}.tb_sessions  as b ON a.session_id = b.session_id
+            INNER JOIN {}.tb_sources as c on a.source_id = c.source_id
         )
-        """.format(db_name,tb_name,db_name,tb_name,db_name)
+        """.format(db_name,tb_name,db_name,tb_name,db_name,db_name)
     def create_default_table(self, table_name, db_name):
         return """
         CREATE TABLE IF NOT EXISTS {}.{} (
@@ -65,12 +122,7 @@ class Ddl(object):
             bitrate Nullable(Int32),
             width Nullable(Int32),
             height Nullable(Int32),
-            utm_source Nullable(String),
-            utm_term Nullable(String),
-            utm_id Nullable(Int32),
-            utm_medium Nullable(String),
-            referrer Nullable(String),
-            referrer_path Nullable(String),
+            source_id Nullable(Int32),
             session_id Int32
 
 

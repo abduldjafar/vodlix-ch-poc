@@ -21,6 +21,9 @@ class DDLServices(object):
         create_session_table_query = self.query.create_table_session(
             "tb_sessions", db_name
         )
+        create_sources_table_query = self.query.create_table_sources(
+            "tb_sources", db_name
+        )
 
         create_view_default_table_joined_sessions_table = (
             self.query.create_view_default_table_joined_sessions_table(db_name, tb_name)
@@ -29,6 +32,7 @@ class DDLServices(object):
 
         self.db.execute_query(create_session_table_query)
         self.db.execute_query(create_default_table_query)
+        self.db.execute_query(create_sources_table_query)
         self.db.execute_query(create_view_default_table_joined_sessions_table)
         self.db.insert_data(
             insert_query_ddl,
@@ -59,6 +63,15 @@ class DDLServices(object):
         self.db.execute_query(query)
 
     def insert_data(self, payload):
+        tb_sources_columns = {
+            "source_id": 0,
+            "utm_source": None,
+            "utm_term": None,
+            "utm_id": None,
+            "utm_medium": None,
+            "referrer": None,
+            "referrer_path": None,
+        }
         tb_sessions_column = {
             "userid": None,
             "session_id": 0,
@@ -96,12 +109,7 @@ class DDLServices(object):
             "bitrate": None,
             "width": None,
             "height": None,
-            "utm_source": None,
-            "utm_term": None,
-            "utm_id": None,
-            "utm_medium": None,
-            "referrer": None,
-            "referrer_path": None,
+            "source_id":None,
             "session_id": 0,
         }
 
@@ -137,6 +145,14 @@ class DDLServices(object):
                 query_insert, [{x: datas[x] for x in list_datas_columns}]
             )
 
+        def check_is_tbsessions_or_tbsources(checking_query):
+            print(checking_query)
+            self.db.execute_query(checking_query)
+            datas = self.db.cursor.fetchall()
+            is_exists = True if len(datas) > 0 else False
+
+            return is_exists
+
         select_query = self.query.select_datas_where(
             ["is_default"],
             "ddl",
@@ -158,16 +174,24 @@ class DDLServices(object):
                 ["session_id='{}'".format(datas["session_id"])],
             )
 
-            self.db.execute_query(query_for_check_sessionid)
-            session_id = self.db.cursor.fetchall()
-            session_id_exist = True if len(session_id) > 0 else False
+            query_for_check_sourcesid = self.query.select_datas_where(
+                ["source_id"],
+                db_name,
+                "tb_sources",
+                "1",
+                "0",
+                ["source_id='{}'".format(datas["source_id"])],
+            )
 
-            if session_id_exist:
-                insert_datas(tb_default_columns, tb_name)
-
-            else:
+            if check_is_tbsessions_or_tbsources(query_for_check_sessionid) != True:
                 insert_datas(tb_sessions_column, "tb_sessions")
-                insert_datas(tb_default_columns, tb_name)
+
+            if (
+                "source_id" in datas or datas["source_id"] != None
+            ) and check_is_tbsessions_or_tbsources(query_for_check_sourcesid) != True:
+                insert_datas(tb_sources_columns, "tb_sources")
+
+            insert_datas(tb_default_columns, tb_name)
         return True, "sucess inserted datas"
 
     def selec_data_from_table(self, db_name, tb_name, column, limit="", offset=""):
