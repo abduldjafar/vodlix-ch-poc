@@ -1,14 +1,10 @@
-import queue
-
-from fastapi import Query
 from queries.ddl import ddl
-from config.config import Config
-
+from servers.clickhouse import ClickhouseServer
 
 class DDLServices(object):
     def __init__(self):
         self.query = ddl.Ddl()
-        self.db = Config()
+        self.db = ClickhouseServer()
         self.db.init()
 
     def create_database(self, db_name):
@@ -146,7 +142,6 @@ class DDLServices(object):
             )
 
         def check_is_tbsessions_or_tbsources(checking_query):
-            print(checking_query)
             self.db.execute_query(checking_query)
             datas = self.db.cursor.fetchall()
             is_exists = True if len(datas) > 0 else False
@@ -236,7 +231,6 @@ class DDLServices(object):
         query = self.query.select_datas_where(
             columns, db_name, tb_name, str(limit), str(page), filtered_conditions
         )
-        print(query)
         self.db.execute_query(query)
         datas = self.db.cursor.fetchall()
 
