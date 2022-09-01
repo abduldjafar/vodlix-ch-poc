@@ -11,6 +11,13 @@ class DDLServices(object):
         query = self.query.create_database(db_name)
         self.db.execute_query(query)
 
+    def create_master_datas(self):
+        create_db_master_query = self.query.create_master_database()
+        create_tb_master_query = self.query.create_master_table()
+
+        self.db.execute_query(create_db_master_query)
+        self.db.execute_query(create_tb_master_query)
+
     def create_default_table(self, db_name, tb_name):
 
         create_default_table_query = self.query.create_default_table(tb_name, db_name)
@@ -251,6 +258,8 @@ class DDLServices(object):
     def delete_table(self, db_name, tb_name):
         query = self.query.delete_table(db_name, tb_name)
         self.db.execute_query(query)
+    
+
 
     def alter_table(self, payload):
         tb_name = payload["tb_name"]

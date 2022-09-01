@@ -8,6 +8,13 @@ class Ddl(object):
         """.format(
             db_name
         )
+    
+    def create_stats_database(self, db_name):
+        return """
+        CREATE DATABASE {}_stats
+        """.format(
+            db_name
+        )
 
     def create_table_sources(self,tb_name,db_name):
          return """
@@ -123,9 +130,8 @@ class Ddl(object):
             width Nullable(Int32),
             height Nullable(Int32),
             source_id Nullable(Int32),
-            session_id Int32
-
-
+            session_id Int32,
+            timestamp DateTime DEFAULT now()
         ) ENGINE = MergeTree order by session_id  partition by session_id;
         """.format(
             db_name, table_name
@@ -154,6 +160,27 @@ class Ddl(object):
             created_at DateTime('Asia/Istanbul')
         ) ENGINE = MergeTree order by db_name  partition by db_name;
         """
+    
+    def create_master_database(self):
+        return """
+        CREATE DATABASE IF NOT EXISTS master_stats
+        """
+
+    def create_master_table(self):
+        return """
+        CREATE TABLE IF NOT EXISTS master_stats.master_table (
+            username String,
+            db_name String
+        ) ENGINE = MergeTree order by db_name;
+        """
+    
+    def check_existing_user(self, username):
+        return"""
+            select 
+                username 
+            from master_stats.master_table 
+            where username = '{}'    
+        """.format(username)
 
     def insert_into_ddl_history(self):
         return "INSERT INTO ddl.history (db_name,tb_name,is_default) VALUES "

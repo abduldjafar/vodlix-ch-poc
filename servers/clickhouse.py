@@ -31,5 +31,5 @@ class ClickhouseServer(object):
         try:
             self.conn = connect('clickhouse://' + self.ch_host)
             self.cursor = self.conn.cursor()
-        except Error as e:
+        except errors.Error as e:
             print(e.message)

@@ -4,8 +4,8 @@ services:
   ch:
     image: "clickhouse/clickhouse-server"
     ports:
-      - "8123:8123"
-      - "9000:9000"
+      - "38123:8123"
+      - "39000:9000"
   backend:
     build: .
     ports:

@@ -15,6 +15,8 @@ class Table(BaseModel):
 class Column(BaseModel):
     columns: List[str]
 
+class User(BaseModel):
+    username: str
 
 class ExampleBody(object):
     def __init__(self):
@@ -29,6 +31,10 @@ class ExampleBody(object):
             "data_type": "String",
         }
 
+    def example_insert_event_table(self):
+        return {
+             
+        }
     def example_insert_data(self):
         return {
             "tb_name": "v1",
