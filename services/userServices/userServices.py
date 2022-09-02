@@ -31,7 +31,7 @@ class UserService(object):
             return "user already exists"
         else:
             self.db.execute_query(create_user_stat_db_query)
-            create_default_table_query = self.query.create_default_table(tb_events, db_name)
+            create_event_table_query = self.query.create_event_table(tb_events, db_name)
             create_session_table_query = self.query.create_table_session(
                 tb_sessions, db_name
             )
@@ -44,9 +44,9 @@ class UserService(object):
             )
 
             self.db.execute_query(create_session_table_query)
-            self.db.execute_query(create_default_table_query)
+            self.db.execute_query(create_event_table_query)
             self.db.execute_query(create_sources_table_query)
-            self.db.execute_query(create_view_default_table_joined_sessions_table)
+            #self.db.execute_query(create_view_default_table_joined_sessions_table)
 
             
             self.db.insert_data(add_user_query,[{"username":username,"db_name":db_name}])

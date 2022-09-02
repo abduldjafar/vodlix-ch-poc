@@ -30,9 +30,68 @@ class ExampleBody(object):
             "operation_type": "DELETE",
             "data_type": "String",
         }
+    def example_insert_sources_table(self):
+        return {
+            "username":"abdul",
+            "data":{
+                "source_id" :32,
+                "utm_source":"",
+                "utm_term" :"",
+                "utm_id":32,
+                "utm_medium":"",
+                "referrer":"",
+                "referrer_path":""
+            }
 
+        }
+    def example_insert_session_table(self):
+        return {
+            "username":"abdul",
+            "data":{
+                "userid":"xxx",	
+                "session_id":"",
+                "app":"",	
+                "app_version":1,	
+                "app_identifier":"",	
+                "ip":""	,
+                "browser":"",	
+                "browser_version"	: 123,
+                "os":"",	
+                "os_version":1,	
+                "device_type":"",
+                "device_name":"",	
+                "country":"",	
+                "region":"",	
+                "city":"",	
+                "latitude":111.111,
+                "longitude":123.44,
+                "isp":"",
+            "speed":111
+            }
+            
+        }
     def example_insert_event_table(self):
         return {
+            "username":"abdul",
+            "data":{
+                "stat_id":"",
+                "object_id":1,
+                "object_type":1,
+                "content_length":0,
+                "content_list_id":1,
+                "uploader_id":"",
+                "partner_id":"",	
+                "event_type":"",
+                "event_value":111,
+                "bitrate":123456,
+                "cust_1":"",
+                "cust_2":"",
+                "cust_3":"",
+                "cust_4":"",
+                "session_id":"",
+                "source_id":"",
+                "timestamp":""
+            }
              
         }
     def example_insert_data(self):
