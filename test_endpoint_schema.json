@@ -11,6 +11,19 @@
 
     },
     {   
+        "title": "create user",
+        "method": "post",
+        "base_url":"http://localhost:18000",
+        "endpoint":"/api/v1/user",
+        "headers":{
+            "accept": "application/json"
+
+        },
+        "data":{
+                "username": "abdul"
+              }
+    },
+    {   
         "title": "request event api",
         "method": "post",
         "base_url":"http://localhost:18000",
