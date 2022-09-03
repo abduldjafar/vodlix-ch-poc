@@ -1,4 +1,4 @@
-FROM python:3.8.13
+FROM python:3.9.12
 ENV CH_HOST=localhost
 COPY . .
 RUN pip install -r req.txt
